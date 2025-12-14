@@ -106,3 +106,35 @@ BEGIN
         SELECT ERROR_MESSAGE() AS ErrorMessage;
     END CATCH
 END;
+
+---only active order show ---
+
+            SELECT 
+    s.SummaryId,
+    s.OrderId,
+    s.CustomerName,
+    s.Phone,
+    s.TotalAmount,
+    s.DiscountAmount,
+    s.FinalAmount,
+    s.CreatedDate,
+    s.CompletedDate,
+
+    o.item_id,
+    mi.item_name AS ItemName,   
+    o.Price,
+    o.FullPortion,
+    o.HalfPortion,
+    o.TableNo,
+    o.OrderStatus,
+    o.OrderType,
+	o.specialInstructions,
+    o.payment_mode
+
+FROM OrderSummary s
+INNER JOIN Orders o 
+    ON s.OrderId = o.OrderId
+LEFT JOIN menu_items mi              
+    ON mi.item_id = o.item_id
+WHERE s.OrderId = @OrderId  AND o.OrderStatus = 4
+ORDER BY o.Id ASC;
