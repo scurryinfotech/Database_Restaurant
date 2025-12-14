@@ -56,3 +56,8 @@ BEGIN
     WHERE O.OrderId = @OrderId;  
 END 
 
+
+----Add Table ---
+Alter Table OrderSummary
+Add specialInstruction Nvarchar(max)
+
