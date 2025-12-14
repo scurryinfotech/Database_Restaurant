@@ -61,3 +61,48 @@ END
 Alter Table OrderSummary
 Add specialInstruction Nvarchar(max)
 
+--  SP for Get Order   ---
+
+
+
+CREATE  OR ALTER PROCEDURE [dbo].[sp_GetOrderHistory]
+    @Username VARCHAR(300)
+AS
+BEGIN
+    BEGIN TRY
+        
+        DECLARE @UserId INT;
+        SET @UserId = (SELECT Id FROM Users WHERE Username = @Username);
+
+        SELECT
+            o.OrderId,
+            o.CustomerName,
+            o.Phone,
+            o.TableNo,
+             mi.item_name AS ItemName,      
+            o.FullPortion,
+            o.HalfPortion,
+            o.Price,
+            o.specialInstructions,
+            os.TotalAmount,
+            os.DiscountAmount,
+            os.FinalAmount,
+            o.Payment_Mode AS PaymentMode,
+            o.CreatedDate AS Date
+        FROM Orders o
+        LEFT JOIN OrderSummary os 
+            ON os.OrderId = o.OrderId
+		LEFT JOIN menu_items mi ON mi.item_id = o.item_id 
+        WHERE 
+            o.CreatedBy = @UserId
+
+			 AND o.IsActive = 0 
+        ORDER BY 
+            o.CreatedDate DESC,	
+            o.OrderId DESC;
+
+    END TRY
+    BEGIN CATCH
+        SELECT ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH
+END;
