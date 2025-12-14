@@ -27,3 +27,32 @@ GO
 
   update [RestaurantDB].[dbo].[AppSettings]
   set SettingValue='true' where SettingKey='IsOrderingAvailableOnline'
+
+USE [RestaurantDB]
+GO
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER   PROCEDURE [dbo].[sp_UpdateTableOrderStatus]  
+    @OrderId NVARCHAR(50),  
+    @StatusId INT,  
+    @Payment_mode NVARCHAR(50),  
+    @RowsAffected INT OUTPUT  
+AS  
+BEGIN  
+    UPDATE dbo.Orders  
+    SET   
+        OrderStatus = @StatusId,  
+        payment_mode = @Payment_mode,  
+        ModifiedDate = GETDATE(),  
+        IsActive = CASE WHEN @StatusId = 3 THEN 0 ELSE IsActive END  
+    WHERE OrderId = @OrderId  and OrderStatus != 4;  
+  
+    SET @RowsAffected = @@ROWCOUNT;  
+  
+    SELECT O.Id AS OrderPrimaryKey, O.OrderId, O.OrderStatus  
+    FROM dbo.Orders O  
+    WHERE O.OrderId = @OrderId;  
+END 
+
