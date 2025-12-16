@@ -245,4 +245,65 @@ BEGIN
     END CATCH
 END;
 
+---Aman sir changes
 
+USE [RestaurantDb]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_UpdateMenuItem]    Script Date: 16.12.2025 2.39.15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+-- Update Menu Item
+Create   PROCEDURE sp_SaveSetTableCount
+    @TableCount INT
+AS
+BEGIN
+   update UserTableMaster set TableCount = @TableCount
+END
+===================================================
+ 
+CREATE or ALTER PROCEDURE sp_GetMenuCategory    
+    @Username VARCHAR(300)    
+AS    
+BEGIN    
+    BEGIN TRY    
+        DECLARE @UserId INT;    
+        SET @UserId = (SELECT Id FROM Users WHERE Username = @Username);    
+        PRINT(@UserId);    
+        SELECT    
+            category_id,    
+            category_name,    
+            description,    
+            CreatedDate,    
+            CreatedBy,    
+            ModifiedDate,    
+            ModifiedBy,    
+            IsActive    
+        FROM menu_categories    
+        WHERE IsActive = 1 --AND CreatedBy = @UserId;    
+    END TRY    
+    BEGIN CATCH    
+        SELECT ERROR_MESSAGE() AS ErrorMessage;    
+    END CATCH    
+END;
+===================================================
+CREATE OR ALTER PROCEDURE sp_SaveMenuCategory
+    @CategoryName NVARCHAR(100),
+    @Description TEXT = NULL,
+    @CreatedBy INT = NULL,
+    @IsActive BIT = 1
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM menu_categories WHERE category_name = @CategoryName)
+    BEGIN
+        -- Optionally, you can return a specific error code or message
+        RAISERROR('Category name already exists.', 16, 1)
+        RETURN
+    END
+ 
+    INSERT INTO menu_categories (category_name, description, CreatedDate, CreatedBy, IsActive)
+    VALUES (@CategoryName, @Description, GETDATE(), @CreatedBy, @IsActive)
+END
+GO
