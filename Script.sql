@@ -138,3 +138,18 @@ LEFT JOIN menu_items mi
     ON mi.item_id = o.item_id
 WHERE s.OrderId = @OrderId  AND o.OrderStatus = 4
 ORDER BY o.Id ASC;
+
+
+
+--- this is for thec check button for the forget password in ui so that we can check the number exizt or not ----
+CREATE PROCEDURE sp_CheckPhoneExists
+    @Phone NVARCHAR(20),
+    @Exists BIT OUTPUT
+AS
+BEGIN
+    IF EXISTS (SELECT 1 FROM Users WHERE PhoneNumber = @Phone)
+        SET @Exists = 1;
+    ELSE
+        SET @Exists = 0;
+END
+
