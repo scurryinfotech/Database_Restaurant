@@ -194,3 +194,55 @@ BEGIN
 END;  
 
 
+
+---- In thids I Have done in sir laptop 
+
+CREATE   or ALter    PROCEDURE [dbo].[sp_GetOrdersByUserId]
+    @UserId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        SELECT 
+            o.Id,
+            o.OrderId,
+            o.OrderStatus AS OrderStatusId,
+            o.FullPortion,
+            o.HalfPortion,
+            o.TableNo,
+            o.CreatedDate,
+            o.CreatedBy,
+            o.ModifiedDate,
+            o.ModifiedBy,
+            mi.item_name AS ItemName,       
+            o.IsActive,
+            o.item_id,
+            o.Price,
+            o.customerName,
+            o.phone,
+            o.OrderType,
+            o.Address,
+            o.payment_mode,
+            o.DeliveryType,
+            o.specialInstructions,
+            osm.Name AS OrderStatus,       
+            u.Username,
+            u.Name,
+            OS.DiscountAmount,
+            o.CreatedDate AS [Date],      
+            o.UserId AS [userId]            
+        FROM Orders o
+        INNER JOIN Users u ON o.UserId = u.Id
+        LEFT JOIN menu_items mi ON mi.item_id = o.item_id 
+        LEFT JOIN OrderSummary OS ON OS.OrderId = o.OrderId 
+        LEFT JOIN OrderStatusMaster osm ON osm.Id = o.OrderStatus  
+        WHERE o.UserId = @UserId
+            
+    END TRY
+    BEGIN CATCH
+        SELECT ERROR_MESSAGE() AS ErrorMessage;
+    END CATCH
+END;
+
+
