@@ -307,3 +307,25 @@ BEGIN
     VALUES (@CategoryName, @Description, GETDATE(), @CreatedBy, @IsActive)
 END
 GO
+
+USE [RestaurantDB]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_ResetPassword]    Script Date: 17.12.2025 9.26.56 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[sp_ResetPassword]
+(
+    @Phone NVARCHAR(20),
+    @Password NVARCHAR(200),
+    @RowsAffected INT OUTPUT
+)
+AS
+BEGIN
+    UPDATE Users
+    SET Password = @Password
+    WHERE Phone = @Phone;
+
+    SET @RowsAffected = @@ROWCOUNT;
+END
