@@ -245,7 +245,152 @@ BEGIN
     END CATCH
 END;
 
----Aman sir changes
+-- =========================
+-- Menu Category Procedures
+-- =========================
+ 
+-- Save (Insert) Menu Category
+CREATE OR ALTER PROCEDURE sp_SaveMenuCategory
+    @CategoryName NVARCHAR(100),
+    @Description TEXT = NULL,
+    @CreatedBy INT = NULL,
+    @IsActive BIT = 1
+AS
+BEGIN
+    INSERT INTO menu_categories (category_name, description, CreatedDate, CreatedBy, IsActive)
+    VALUES (@CategoryName, @Description, GETDATE(), @CreatedBy, @IsActive)
+END
+GO
+ 
+-- Update Menu Category
+CREATE OR ALTER PROCEDURE sp_UpdateMenuCategory
+    @CategoryId INT,
+    @CategoryName NVARCHAR(100),
+    @Description TEXT = NULL,
+    @ModifiedBy INT = NULL,
+    @IsActive BIT = 1
+AS
+BEGIN
+    UPDATE menu_categories
+    SET
+        category_name = @CategoryName,
+        description = @Description,
+        ModifiedDate = GETDATE(),
+        ModifiedBy = @ModifiedBy,
+        IsActive = @IsActive
+    WHERE category_id = @CategoryId
+END
+GO
+ 
+-- =========================
+-- Menu Subcategory Procedures
+-- =========================
+ 
+-- Save (Insert) Menu Subcategory
+CREATE OR ALTER PROCEDURE sp_SaveMenuSubcategory
+    @CategoryId INT,
+    @SubcategoryName NVARCHAR(255),
+    @Description TEXT = NULL,
+    @DisplayOrder INT = NULL,
+    @CreatedBy INT = NULL,
+    @IsActive BIT = 1
+AS
+BEGIN
+    INSERT INTO menu_subcategories (category_id, subcategory_name, description, display_order, CreatedDate, CreatedBy, IsActive)
+    VALUES (@CategoryId, @SubcategoryName, @Description, @DisplayOrder, GETDATE(), @CreatedBy, @IsActive)
+END
+GO
+ 
+-- Update Menu Subcategory
+CREATE OR ALTER PROCEDURE sp_UpdateMenuSubcategory
+    @SubcategoryId INT,
+    @CategoryId INT,
+    @SubcategoryName NVARCHAR(255),
+    @Description TEXT = NULL,
+    @DisplayOrder INT = NULL,
+    @ModifiedBy INT = NULL,
+    @IsActive BIT = 1
+AS
+BEGIN
+    UPDATE menu_subcategories
+    SET
+        category_id = @CategoryId,
+        subcategory_name = @SubcategoryName,
+        description = @Description,
+        display_order = @DisplayOrder,
+        ModifiedDate = GETDATE(),
+        ModifiedBy = @ModifiedBy,
+        IsActive = @IsActive
+    WHERE subcategory_id = @SubcategoryId
+END
+GO
+ 
+-- =========================
+-- Menu Item Procedures
+-- =========================
+ 
+-- Save (Insert) Menu Item
+CREATE OR ALTER PROCEDURE sp_SaveMenuItem
+    @SubcategoryId INT,
+    @ItemName NVARCHAR(255),
+    @Description TEXT = NULL,
+    @ImageSrc VARCHAR(MAX) = NULL,
+    @Price1 DECIMAL(10,2) = NULL,
+    @Price2 DECIMAL(10,2) = NULL,
+    @Count1 INT = NULL,
+    @Count2 INT = NULL,
+    @Title NVARCHAR(255) = NULL,
+    @CreatedBy INT = NULL,
+    @IsActive BIT = 1,
+    @ImageData VARCHAR(MAX) = NULL
+AS
+BEGIN
+    INSERT INTO menu_items (
+        subcategory_id, item_name, description, image_src, price1, price2, count1, count2, title,
+        CreatedDate, CreatedBy, IsActive, image_data
+    )
+    VALUES (
+        @SubcategoryId, @ItemName, @Description, @ImageSrc, @Price1, @Price2, @Count1, @Count2, @Title,
+        GETDATE(), @CreatedBy, @IsActive, @ImageData
+    )
+END
+GO
+ 
+-- Update Menu Item
+CREATE OR ALTER PROCEDURE sp_UpdateMenuItem
+    @ItemId INT,
+    @SubcategoryId INT,
+    @ItemName NVARCHAR(255),
+    @Description TEXT = NULL,
+    @ImageSrc VARCHAR(MAX) = NULL,
+    @Price1 DECIMAL(10,2) = NULL,
+    @Price2 DECIMAL(10,2) = NULL,
+    @Count1 INT = NULL,
+    @Count2 INT = NULL,
+    @Title NVARCHAR(255) = NULL,
+    @ModifiedBy INT = NULL,
+    @IsActive BIT = 1,
+    @ImageData VARCHAR(MAX) = NULL
+AS
+BEGIN
+    UPDATE menu_items
+    SET
+        subcategory_id = @SubcategoryId,
+        item_name = @ItemName,
+        description = @Description,
+        image_src = @ImageSrc,
+        price1 = @Price1,
+        price2 = @Price2,
+        count1 = @Count1,
+        count2 = @Count2,
+        title = @Title,
+        ModifiedDate = GETDATE(),
+        ModifiedBy = @ModifiedBy,
+        IsActive = @IsActive,
+        image_data = @ImageData
+    WHERE item_id = @ItemId
+END
+GO
 
 USE [RestaurantDb]
 GO
@@ -383,3 +528,44 @@ BEGIN
     WHERE Username = @loginame AND Password = @Password AND u.IsActive = 1
 	order by o.id desc
 END
+
+USE [RestaurantDB]
+GO
+ 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ 
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetBillByOrderId]
+    @OrderId NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        s.SummaryId,
+        s.OrderId,
+        s.CustomerName,
+        s.Phone,
+        s.TotalAmount,
+        s.DiscountAmount,
+        s.FinalAmount,
+        s.CreatedDate,
+        s.CompletedDate,
+        o.item_id,
+        mi.item_name AS ItemName,   
+        o.Price,
+        o.FullPortion,
+        o.HalfPortion,
+        o.TableNo,
+        o.OrderStatus,
+        o.OrderType,
+        o.specialInstructions,
+        o.payment_mode
+    FROM OrderSummary s
+    INNER JOIN Orders o ON s.OrderId = o.OrderId
+    LEFT JOIN menu_items mi ON mi.item_id = o.item_id
+    WHERE s.OrderId = @OrderId
+    ORDER BY o.Id ASC;
+END
+GO
