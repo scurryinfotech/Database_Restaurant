@@ -368,3 +368,18 @@ BEGIN
     ORDER BY o.Id ASC;
 END
 GO
+
+
+-- this is modified sp-- 
+ ALTER PROCEDURE [dbo].[sp_LoginUser]
+    @loginame NVARCHAR(100),
+    @Password NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT TOP 1 u.Username, u.Password, u.Name, u.CreatedDate, u.IsActive,o.Address
+    FROM Users u
+	left Join Orders as o ON u.Id = o.UserId
+    WHERE Username = @loginame AND Password = @Password AND u.IsActive = 1
+	order by o.id desc
+END
