@@ -329,3 +329,42 @@ BEGIN
 
     SET @RowsAffected = @@ROWCOUNT;
 END
+
+-- Create Procedure --   for getOrderId
+CREATE PROCEDURE sp_GetBillByOrderId
+    @OrderId NVARCHAR(100)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        s.SummaryId,
+        s.OrderId,
+        s.CustomerName,
+        s.Phone,
+        s.TotalAmount,
+        s.DiscountAmount,
+        s.FinalAmount,
+        s.CreatedDate,
+        s.CompletedDate,
+
+        o.item_id,
+        mi.item_name AS ItemName,   
+        o.Price,
+        o.FullPortion,
+        o.HalfPortion,
+        o.TableNo,
+        o.OrderStatus,
+        o.OrderType,
+        o.specialInstructions,
+        o.payment_mode
+
+    FROM OrderSummary s
+    INNER JOIN Orders o 
+        ON s.OrderId = o.OrderId
+    LEFT JOIN menu_items mi              
+        ON mi.item_id = o.item_id
+    WHERE s.OrderId = @OrderId
+    ORDER BY o.Id ASC;
+END
+GO
