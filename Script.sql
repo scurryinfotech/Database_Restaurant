@@ -569,3 +569,24 @@ BEGIN
     ORDER BY o.Id ASC;
 END
 GO
+--- Address sp --- 
+CREATE or alter PROCEDURE sp_GetCustomerAddress
+    @UserId Varchar(1000)
+   
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Prefer UserId
+    IF (@UserId IS NOT NULL AND @UserId > 0)
+    BEGIN
+        SELECT TOP 1
+            Address
+        FROM Orders
+        WHERE UserId = @UserId
+          AND IsActive = 1
+        ORDER BY CreatedDate DESC;
+        RETURN;
+    END
+   
+END
