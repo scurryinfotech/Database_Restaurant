@@ -147,11 +147,12 @@ CREATE PROCEDURE sp_CheckPhoneExists
     @Exists BIT OUTPUT
 AS
 BEGIN
-    IF EXISTS (SELECT 1 FROM Users WHERE PhoneNumber = @Phone)
+    IF EXISTS (SELECT 1 FROM Users WHERE Username = @Phone)
         SET @Exists = 1;
     ELSE
         SET @Exists = 0;
 END
+
 
 
 -- I have done for menu items to get --
@@ -606,5 +607,6 @@ BEGIN
     FROM AppSettings
     WHERE Id = 3;
 END;
+
 
 
