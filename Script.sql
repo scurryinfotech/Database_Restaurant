@@ -608,3 +608,43 @@ BEGIN
 END;
 
 
+
+
+-- I have done for menu items to get --
+USE [RestaurantDB]
+GO
+/****** Object:  StoredProcedure [dbo].[sp_GetMenuItem]    Script Date: 12/16/2025 3:24:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE OR ALTER PROCEDURE [dbo].[sp_GetMenuItem]  
+    @Username VARCHAR(300)  
+AS  
+BEGIN  
+    BEGIN TRY  
+        DECLARE @UserId INT;  
+        SET @UserId = (SELECT Id FROM Users WHERE Username = @Username);  
+        SELECT  
+            item_id,  
+            subcategory_id,  
+            item_name,  
+            description,  
+            image_data,  
+            price1,  
+            price2,  
+            count1,  
+            count2,  
+            title,  
+            CreatedDate,  
+            CreatedBy,  
+            ModifiedDate,  
+            ModifiedBy,  
+            IsActive  
+        FROM menu_items  
+        WHERE IsActive = 1 OR IsActive = 0 AND CreatedBy = @UserId;  
+    END TRY  
+    BEGIN CATCH  
+        SELECT ERROR_MESSAGE() AS ErrorMessage;  
+    END CATCH  
+END;  
