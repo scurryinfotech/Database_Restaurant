@@ -597,16 +597,14 @@ END
 Insert into AppSettings(SettingKey , SettingValue)
 values('FixedDiscount',10);
 
-
-CREATE PROCEDURE Sp_getFixedDiscount
+CREATE or ALTER PROCEDURE Sp_getFixedDiscount
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT SettingKey
+    SELECT SettingValue
     FROM AppSettings
-    WHERE Id = 3;
+    WHERE SettingKey='FixedDiscount';
 END;
-
 
 
